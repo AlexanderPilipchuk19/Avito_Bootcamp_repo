@@ -1,0 +1,31 @@
+phase,experiment,model,data,brier,score,latency_ms,weights_mb,decision,notes
+1,B0: постоянная вероятность,Constant p=0.5,TextOCR real val,0.25,0.75,0.0,0.0,контрольная точка,Без чтения пикселей
+1,B1: штатный baseline,PP-LCNet x0.25,TextOCR real val,0.098199406,0.901800594,2.7936,0.985712,основной кандидат,Специализированные pretrained weights; native 160x80
+1,B2: общий бюджет,LCNet 0.5,Synthetic + TextOCR,0.2502752892,0.7497247108,4.0185,2.476447,отклонено,"Обучение с нуля, 800 шагов"
+1,B3: общий бюджет,MobileNetV3-Small,Synthetic + TextOCR,0.2613834906,0.7386165094,3.3829,6.194421,отклонено,"Обучение с нуля, 800 шагов"
+1,B4: общий бюджет,ShuffleNetV2 0.5x,Synthetic + TextOCR,0.249445109,0.750554891,3.3176,1.496035,исследовательская ветка,"Обучение с нуля, 800 шагов"
+3,"realistic synthetic, 0% real-general",ShuffleNetV2 0.5x,100% realistic synthetic,0.2513915542,0.7486084458,,1.496035,базовый состав,TextOCR dev
+3,realistic + 5% real-general,ShuffleNetV2 0.5x,95% synthetic + 5% TextOCR,0.2486346837,0.7513653163,,1.496035,рабочая смесь B4,Лучший point estimate первого seed
+3,realistic + 10% real-general,ShuffleNetV2 0.5x,90% synthetic + 10% TextOCR,0.2501300718,0.7498699282,,1.496035,отклонено,Хуже 5%
+3,realistic + 20% real-general,ShuffleNetV2 0.5x,80% synthetic + 20% TextOCR,0.2505486541,0.7494513459,,1.496035,отклонено,Хуже 5%
+3,"5% real-general, второй seed",ShuffleNetV2 0.5x,95% synthetic + 5% TextOCR,0.2502765208,0.7497234792,,1.496035,ограниченное воспроизведение,Рабочая доля не является доказанным оптимумом
+3,simple synthetic,ShuffleNetV2 0.5x,100% simple synthetic,0.2809644448,0.7190355552,,1.496035,отклонено,Realistic заметно лучше
+4,whole-crop h48,ShuffleNetV2 0.5x,TextOCR dev,0.2486346835,0.7513653165,3.7723,1.496035,выбрано для B4,"AR сохраняется, 48x384, без окон"
+4,whole-crop h64,ShuffleNetV2 0.5x,TextOCR dev,0.2566321991,0.7433678009,5.4904,1.496035,отклонено,64x512
+4,windowing start/center/end,ShuffleNetV2 0.5x,TextOCR dev,,,,,не запускалось,Gate деградации длинных строк не сработал
+5,single pass B4,ShuffleNetV2 0.5x,TextOCR dev,0.2486346835,0.7513653165,4.3262,1.496035,выбрано для B4,Двухпроходный выигрыш меньше 0.001
+5,probability averaging B4,ShuffleNetV2 0.5x,TextOCR dev,0.2480622724,0.7519377276,7.8525,1.496035,отклонено для B4,Небольшой выигрыш при двух проходах
+5,logit antisymmetry B4,ShuffleNetV2 0.5x,TextOCR dev,0.2480559915,0.7519440085,7.8525,1.496035,отклонено для B4,Решение не переносилось на B1
+6,temperature scaling B4,ShuffleNetV2 0.5x,TextOCR calibration,0.2489110213,0.7510889787,,1.519683,ветка B4,До: 0.248948; T=0.813765
+audit,single pass B1,PP-LCNet x0.25,TextOCR dev,0.098199406,0.901800594,,0.985712,сравнить симметрию,Native preprocessing
+audit,probability averaging B1,PP-LCNet x0.25,TextOCR dev,0.0570710018,0.9429289982,,0.985712,кандидат,Два прохода
+audit,logit antisymmetry B1,PP-LCNet x0.25,TextOCR dev,0.0389548614,0.9610451386,,0.985712,выбрано,Два прохода
+7,OCR blend alpha=0.05,PP-LCNet + EasyOCR,TextOCR dev,0.0396978247,0.9603021753,36.2256,16.242235,отклонено,"Нет подтверждённого выигрыша, высокая задержка"
+7,OCR blend alpha=0.10,PP-LCNet + EasyOCR,TextOCR dev,0.0408543605,0.9591456395,36.2256,16.242235,отклонено,Brier хуже
+7,OCR blend alpha=0.20,PP-LCNet + EasyOCR,TextOCR dev,0.0461121903,0.9538878097,36.2256,16.242235,отклонено,Brier хуже
+7,direct Paddle FP32,PP-LCNet x0.25,TextOCR dev,0.0392212249,0.9607787751,1.2594,0.985712,выбрано,Microbenchmark full-path p50; контекст отличается от финального
+7,oneDNN FP32,PP-LCNet x0.25,TextOCR dev,0.0392212249,0.9607787751,1.9445,0.985712,отклонено,Медленнее по full-path p50
+7,oneDNN INT8 flag,PP-LCNet x0.25,TextOCR dev,0.0392212249,0.9607787751,1.8163,0.985712,отклонено,Эффективный quantized artifact не получен
+8,финальный dev pipeline,PP-LCNet x0.25,TextOCR dev,0.039221,0.960779,,0.985712,зафиксировано,Native 160x80; antisymmetry; T=0.857252
+8,закрытый внутренний holdout,PP-LCNet x0.25,TextOCR holdout,0.040032,0.959968,3.302,0.985712,итоговая внутренняя оценка,p50 финального полного пути; pipeline после holdout не менялся
+stress,финальный synthetic stress-test,PP-LCNet x0.25,Generator v1.1 Cyrillic,0.142883,0.857117,,0.985712,только диагностика,Не сравнивать напрямую с TextOCR или leaderboard

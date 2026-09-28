@@ -1,0 +1,10 @@
+{
+  "dev_brier": 0.039221,
+  "holdout_brier": 0.040032,
+  "internal_holdout_score": 0.959968,
+  "latency_p50_ms": 3.302,
+  "latency_p95_ms": 9.031,
+  "throughput_boxes_sec": 284.632,
+  "weights_mb": 0.985712,
+  "bundle_mb": 1.090571
+}
